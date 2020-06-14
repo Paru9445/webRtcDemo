@@ -5,7 +5,7 @@ var nodeStatic = require('node-static');
 var http = require('http');
 var https = require("https");
 var socketIO = require('socket.io');
-
+var fs = require("fs");
 var fileServer = new(nodeStatic.Server)();
 
 // var app = http.createServer(function(req, res) {
