@@ -3,12 +3,23 @@
 var os = require('os');
 var nodeStatic = require('node-static');
 var http = require('http');
+var https = require("https");
 var socketIO = require('socket.io');
 
 var fileServer = new(nodeStatic.Server)();
-var app = http.createServer(function(req, res) {
+
+// var app = http.createServer(function(req, res) {
+//   fileServer.serve(req, res);
+// }).listen(8080);
+
+var privateKey = fs.readFileSync("sslcert/private.key", "utf8");
+var certificate = fs.readFileSync("sslcert/certificate.crt", "utf8");
+var credentials = { key: privateKey, cert: certificate };
+
+var app = https.createServer(credentials, function(req, res) {
   fileServer.serve(req, res);
 }).listen(8080);
+
 
 var io = socketIO.listen(app);
 io.sockets.on('connection', function(socket) {
