@@ -13,13 +13,13 @@ var certificate = fs.readFileSync("sslcert/learnomacertificate.crt", "utf8");
 
 var credentials = { key: privateKey, cert: certificate };
 
-// var app = https.createServer(credentials, function(req, res) {
-//   fileServer.serve(req, res);
-// }).listen(8080);
-
-var app = http.createServer(function(req, res) {
+var app = https.createServer(credentials, function(req, res) {
   fileServer.serve(req, res);
 }).listen(8080);
+
+// var app = http.createServer(function(req, res) {
+//   fileServer.serve(req, res);
+// }).listen(8080);
 
 
 var io = socketIO.listen(app);
