@@ -6,20 +6,20 @@ var http = require('http');
 var https = require("https");
 var socketIO = require('socket.io');
 var fs = require("fs");
-var fileServer = new(nodeStatic.Server)();
+var fileServer = new(nodeStatic.Server)('./public');
 
 var privateKey = fs.readFileSync("sslcert/learnomaprivate.key", "utf8");
 var certificate = fs.readFileSync("sslcert/learnomacertificate.crt", "utf8");
 
 var credentials = { key: privateKey, cert: certificate };
 
-var app = https.createServer(credentials, function(req, res) {
-  fileServer.serve(req, res);
-}).listen(8080);
-
-// var app = http.createServer(function(req, res) {
+// var app = https.createServer(credentials, function(req, res) {
 //   fileServer.serve(req, res);
 // }).listen(8080);
+
+var app = http.createServer(function(req, res) {
+  fileServer.serve(req, res);
+}).listen(8080);
 
 
 var io = socketIO.listen(app);

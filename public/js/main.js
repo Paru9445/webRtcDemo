@@ -40,6 +40,7 @@ socket.on('created', function(room) {
 
 socket.on('full', function(room) {
   console.log('Room ' + room + ' is full');
+  alert("Room is full")
 });
 
 socket.on('join', function (room){
@@ -113,7 +114,8 @@ function gotStream(stream) {
 }
 
 var constraints = {
-  video: true
+  video: true,
+  audio: true
 };
 
 console.log('Getting user media with constraints', constraints);
@@ -151,7 +153,8 @@ function createPeerConnection() {
     pc.onaddstream = handleRemoteStreamAdded;
     pc.onremovestream = handleRemoteStreamRemoved;
     console.log('Created RTCPeerConnnection');
-  } catch (e) {
+  }
+  catch (e) {
     console.log('Failed to create PeerConnection, exception: ' + e.message);
     alert('Cannot create RTCPeerConnection object.');
     return;
