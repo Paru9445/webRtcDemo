@@ -54,7 +54,7 @@ io.sockets.on('connection', function(socket) {
       log('Client ID ' + socket.id + ' joined room ' + room);
       io.sockets.in(room).emit('join', room);
       socket.join(room);
-      socket.emit('joined', room, socket.id);
+      socket.emit('joined', room, " socket.id ", socket.id);
       io.sockets.in(room).emit('ready');
     } 
     // else { 
@@ -62,6 +62,20 @@ io.sockets.on('connection', function(socket) {
     //   socket.emit('full', room);
     // }
   });
+
+  socket.on('servercreate', function(room){
+    socket.join(room);
+      log('Client ID ' + socket.id + ' created room ' + room);
+      socket.emit('created', room, socket.id);
+  })
+
+  socket.on('serverjoin', function(room){
+    socket.join(room);
+    io.sockets.in(room).emit('join', room);
+    socket.join(room);
+    socket.emit('joined', room, " socket.id ", socket.id);
+    io.sockets.in(room).emit('ready');
+  })
 
   socket.on('ipaddr', function() {
     var ifaces = os.networkInterfaces();

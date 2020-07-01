@@ -22,40 +22,22 @@ var sdpConstraints = {
 
 /////////////////////////////////////////////
 
-var room = 'foo';
+var room = 'zoo';
 // Could prompt for room name:
 // room = prompt('Enter room name:');
-
-// Add click event handlers for buttons.
-startButton.addEventListener('click', maybeStart);
-// callButton.addEventListener('click', callAction);
-// hangupButton.addEventListener('click', hangupAction);
 
 var socket = io.connect();
 
 if (room !== '') {
-  socket.emit('create or join', room);
-  console.log('Attempted to create or  join room', room);
-}
-
-function createRoom(room){
-  console.log("room is ", room);
-  socket.emit('servercreate', room);
+  // socket.emit('create or join', room);
+  joinRoom(room);
+  // console.log('Attempted to create or  join room', room);
 }
 
 function joinRoom(room){
   socket.emit('serverjoin', room);
 }
 
-socket.on('created', function(room) {
-  console.log('Created room ' + room);
-  isInitiator = true;
-});
-
-// socket.on('full', function(room) {
-//   console.log('Room ' + room + ' is full');
-//   alert("Room is full")
-// });
 
 socket.on('join', function (room){
   console.log('Another peer made a request to join room ' + room);
@@ -82,23 +64,28 @@ function sendMessage(message) {
 // This client receives a message
 socket.on('message', function(message) {
   console.log('Client received message:', message);
+
   if (message === 'got user media') {
+    // maybeStart();
+  } 
+  else if (message.type === 'offer') {
+    
     maybeStart();
-  } else if (message.type === 'offer') {
-    if (!isInitiator && !isStarted) {
-      maybeStart();
-    }
+    
     pc.setRemoteDescription(new RTCSessionDescription(message));
     doAnswer();
-  } else if (message.type === 'answer' && isStarted) {
+  } 
+  else if (message.type === 'answer') {
     pc.setRemoteDescription(new RTCSessionDescription(message));
-  } else if (message.type === 'candidate' && isStarted) {
+  } 
+  else if (message.type === 'candidate') {
     var candidate = new RTCIceCandidate({
       sdpMLineIndex: message.label,
       candidate: message.candidate
     });
     pc.addIceCandidate(candidate);
-  } else if (message === 'bye' && isStarted) {
+  } 
+  else if (message === 'bye') {
     handleRemoteHangup();
   }
 });
@@ -146,7 +133,7 @@ function maybeStart() {
     console.log('>>>>>> creating peer connection');
     createPeerConnection();
     pc.addStream(localStream);
-    isStarted = true;
+    // isStarted = true;
     console.log('isInitiator', isInitiator);
     if (isInitiator) {
       doCall();
@@ -264,11 +251,11 @@ function hangup() {
 function handleRemoteHangup() {
   console.log('Session terminated.');
   stop();
-  isInitiator = false;
 }
 
 function stop() {
-  isStarted = false;
-  pc.close();
-  pc = null;
+  if(pc){
+    pc.close();
+    pc = null;
+  }
 }

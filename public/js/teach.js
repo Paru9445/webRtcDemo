@@ -2,7 +2,7 @@
 
 var isChannelReady = false;
 var isInitiator = false;
-var isStarted = false;
+
 var localStream;
 var pc;
 var remoteStream;
@@ -22,7 +22,7 @@ var sdpConstraints = {
 
 /////////////////////////////////////////////
 
-var room = 'foo';
+var room = 'zoo';
 // Could prompt for room name:
 // room = prompt('Enter room name:');
 
@@ -34,8 +34,9 @@ startButton.addEventListener('click', maybeStart);
 var socket = io.connect();
 
 if (room !== '') {
-  socket.emit('create or join', room);
-  console.log('Attempted to create or  join room', room);
+  // socket.emit('create or join', room);
+  createRoom(room);
+  // console.log('Attempted to create or  join room', room);
 }
 
 function createRoom(room){
@@ -84,21 +85,25 @@ socket.on('message', function(message) {
   console.log('Client received message:', message);
   if (message === 'got user media') {
     maybeStart();
-  } else if (message.type === 'offer') {
-    if (!isInitiator && !isStarted) {
+  } 
+  else if (message.type === 'offer') {
+    if (!isInitiator ) {
       maybeStart();
     }
     pc.setRemoteDescription(new RTCSessionDescription(message));
     doAnswer();
-  } else if (message.type === 'answer' && isStarted) {
+  } 
+  else if (message.type === 'answer') {
     pc.setRemoteDescription(new RTCSessionDescription(message));
-  } else if (message.type === 'candidate' && isStarted) {
+  } 
+  else if (message.type === 'candidate') {
     var candidate = new RTCIceCandidate({
       sdpMLineIndex: message.label,
       candidate: message.candidate
     });
     pc.addIceCandidate(candidate);
-  } else if (message === 'bye' && isStarted) {
+  } 
+  else if (message === 'bye') {
     handleRemoteHangup();
   }
 });
@@ -141,13 +146,13 @@ if (location.hostname !== 'localhost') {
 }
 
 function maybeStart() {
-  console.log('>>>>>>> maybeStart() ', isStarted, localStream, isChannelReady);
-  if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
+  console.log('>>>>>>> maybeStart() ', localStream, isChannelReady);
+  if (typeof localStream !== 'undefined' && isChannelReady) {
     console.log('>>>>>> creating peer connection');
     createPeerConnection();
     pc.addStream(localStream);
-    isStarted = true;
     console.log('isInitiator', isInitiator);
+
     if (isInitiator) {
       doCall();
     }
@@ -264,11 +269,12 @@ function hangup() {
 function handleRemoteHangup() {
   console.log('Session terminated.');
   stop();
-  isInitiator = false;
+  // isInitiator = false;
 }
 
 function stop() {
-  isStarted = false;
-  pc.close();
-  pc = null;
+  if(pc){
+    pc.close();
+    pc = null;
+  }
 }
