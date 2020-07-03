@@ -82,7 +82,7 @@ function sendMessage(message) {
 
 // This client receives a message
 socket.on('message', function(message) {
-  console.log('Client received message:', message);
+  console.log('Client received message: ', message.type);
   if (message === 'got user media') {
     maybeStart();
   } 
@@ -97,11 +97,13 @@ socket.on('message', function(message) {
     pc.setRemoteDescription(new RTCSessionDescription(message));
   } 
   else if (message.type === 'candidate') {
+    
     var candidate = new RTCIceCandidate({
       sdpMLineIndex: message.label,
       candidate: message.candidate
     });
-    pc.addIceCandidate(candidate);
+
+    pc.addCandidate(candidate);
   } 
   else if (message === 'bye') {
     handleRemoteHangup();

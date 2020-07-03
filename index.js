@@ -44,7 +44,7 @@ io.sockets.on('connection', function(socket) {
     var clientsInRoom = io.sockets.adapter.rooms[room];
     var numClients = clientsInRoom ? Object.keys(clientsInRoom.sockets).length : 0;
     log('Room ' + room + ' now has ' + numClients + ' client(s)');
-
+    console.log("Room ", numClients);
     if (numClients === 0) {
       socket.join(room);
       log('Client ID ' + socket.id + ' created room ' + room);
@@ -64,12 +64,21 @@ io.sockets.on('connection', function(socket) {
   });
 
   socket.on('servercreate', function(room){
+    var clientsInRoom = io.sockets.adapter.rooms[room];
+    var numClients = clientsInRoom ? Object.keys(clientsInRoom.sockets).length : 0;
+    console.log("Room created >> ", numClients);
+
     socket.join(room);
       log('Client ID ' + socket.id + ' created room ' + room);
       socket.emit('created', room, socket.id);
   })
 
   socket.on('serverjoin', function(room){
+    var clientsInRoom = io.sockets.adapter.rooms[room];
+    var numClients = clientsInRoom ? Object.keys(clientsInRoom.sockets).length : 0;
+
+    console.log("Room ", numClients);
+
     socket.join(room);
     io.sockets.in(room).emit('join', room);
     socket.join(room);
